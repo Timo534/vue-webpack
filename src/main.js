@@ -10,6 +10,7 @@ class Person {
   
   sayHello() {
     console.log(`Hello, my name is ${this.name}`);
+    console.log(`Hello, my age is ${this.age}`);
   }
 }
 

@@ -2,6 +2,8 @@ const path = require('path')
 const { VueLoaderPlugin } = require('vue-loader');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
+const MiniCssExtractPlugin = require("mini-css-extract-plugin")
+const devMode = process.env.NODE_ENV !== 'production'
 
 module.exports = {
   // 入口文件
@@ -28,11 +30,34 @@ module.exports = {
       },
       {
         test: /\.css$/,
-        use: [ 'style-loader', 'css-loader', 'postcss-loader' ]
+        use: [
+          {
+            loader: MiniCssExtractPlugin.loader,
+            options: {
+              // you can specify a publicPath here
+              // by default it use publicPath in webpackOptions.output
+              // publicPath: '/public/path/to/'
+            }
+          },
+          'css-loader',
+          'postcss-loader'
+        ]
       },
       {
         test: /\.scss$/,
-        use: [ 'style-loader', 'css-loader', 'sass-loader', 'postcss-loader' ]
+        use: [
+          {
+            loader: MiniCssExtractPlugin.loader,
+            options: {
+              // you can specify a publicPath here
+              // by default it use publicPath in webpackOptions.output
+              // publicPath: '/public/path/to/'
+            }
+          },
+          'css-loader',
+          'sass-loader',
+          'postcss-loader'
+        ]
       },
       {
         test: /\.(gif|jpg|jpeg|png|svg)$/i,
@@ -42,7 +67,7 @@ module.exports = {
             limit: 1000,
             esModule: false,
             name: '[name]-[hash].[ext]',
-            publicPath: 'dist/assets/images/',
+            publicPath: 'assets/images/',
             outputPath: 'assets/images/'
           }
         }]
@@ -54,9 +79,23 @@ module.exports = {
       }
     ]
   },
+  devtool: 'inline-source-map',
   plugins: [
     new VueLoaderPlugin(),
     new CleanWebpackPlugin(),
-    new HtmlWebpackPlugin()
-  ]
+    new MiniCssExtractPlugin({
+      filename: 'assets/css/[name].css',
+      chunkFilename: '[id].css'
+    }),
+    new HtmlWebpackPlugin({
+      template: './index.html',
+      inject: 'body',
+      hot: true
+    })
+  ],
+  devServer: {
+    contentBase: path.join(__dirname, 'dist'),
+    port: 8080,
+    // open: true
+  }
 }

@@ -1,23 +1,26 @@
 const path = require('path')
-const { VueLoaderPlugin } = require('vue-loader');
+const { VueLoaderPlugin } = require('vue-loader')
 const { CleanWebpackPlugin } = require('clean-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
-const MiniCssExtractPlugin = require("mini-css-extract-plugin")
+const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const devMode = process.env.NODE_ENV !== 'production'
 
 module.exports = {
   // 入口文件
-  entry: path.join(__dirname, 'src/main.js'),
+  entry: {
+    learn: './src/learn/main.ts',
+    task: './src/task/main.ts'
+  },
   // 输出文件位置
   output: {
     path: path.join(__dirname, 'dist'),
-    filename: 'vue-project.bundle.js'
+    filename: '[name]/[name].[hash].bundle.js'
   },
   // 模块的解析规则
   resolve: {
-    extensions: ['.js', '.json', '.vue'],
+    extensions: ['.ts', '.js', '.json', '.vue'],
     alias: {
-      'vue$': 'vue/dist/vue.esm.js',
+      vue$: 'vue/dist/vue.esm.js',
       '@': path.join(__dirname, 'src')
     }
   },
@@ -34,6 +37,7 @@ module.exports = {
           {
             loader: MiniCssExtractPlugin.loader,
             options: {
+              publicPath: '../../'
               // you can specify a publicPath here
               // by default it use publicPath in webpackOptions.output
               // publicPath: '/public/path/to/'
@@ -49,6 +53,7 @@ module.exports = {
           {
             loader: MiniCssExtractPlugin.loader,
             options: {
+              publicPath: '../../'
               // you can specify a publicPath here
               // by default it use publicPath in webpackOptions.output
               // publicPath: '/public/path/to/'
@@ -60,15 +65,22 @@ module.exports = {
         ]
       },
       {
+        test: /\.tsx?$/,
+        loader: 'ts-loader',
+        exclude: /node_modules/,
+        options: {
+          appendTsSuffixTo: [/\.vue$/]
+        }
+      },
+      {
         test: /\.(gif|jpg|jpeg|png|svg)$/i,
         use: [{
           loader: 'url-loader',
           options: {
             limit: 1000,
             esModule: false,
-            name: '[name]-[hash].[ext]',
-            publicPath: 'assets/images/',
-            outputPath: 'assets/images/'
+            name: 'assets/images/[name]-[hash].[ext]',
+            publicPath: '../'
           }
         }]
       },
@@ -79,23 +91,37 @@ module.exports = {
       }
     ]
   },
-  devtool: 'inline-source-map',
+  devtool: devMode ? 'inline-source-map' : '',
+  optimization: {
+    splitChunks: {
+      name: 'common'
+    }
+  },
   plugins: [
     new VueLoaderPlugin(),
     new CleanWebpackPlugin(),
     new MiniCssExtractPlugin({
-      filename: 'assets/css/[name].css',
+      filename: '[name]/[name].css',
       chunkFilename: '[id].css'
     }),
     new HtmlWebpackPlugin({
-      template: './index.html',
+      template: './src/learn/index.html',
+      filename: 'learn/index.html',
+      inject: 'body',
+      chunks: ['learn'],
+      hot: true
+    }),
+    new HtmlWebpackPlugin({
+      template: './src/task/index.html',
+      filename: 'task/index.html',
+      chunks: ['task'],
       inject: 'body',
       hot: true
     })
   ],
   devServer: {
     contentBase: path.join(__dirname, 'dist'),
-    port: 8080,
+    port: 8080
     // open: true
   }
 }

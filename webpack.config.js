@@ -6,6 +6,7 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const devMode = process.env.NODE_ENV !== 'production'
 
 module.exports = {
+  mode: devMode ? 'development' : 'production',
   // 入口文件
   entry: {
     learn: './src/learn/main.ts',
@@ -13,8 +14,10 @@ module.exports = {
   },
   // 输出文件位置
   output: {
+    publicPath: '../',
     path: path.join(__dirname, 'dist'),
-    filename: '[name]/[name].[hash].bundle.js'
+    filename: '[name]/[name].[contenthash].bundle.js',
+    chunkFilename: 'assets/js/[contenthash].js'
   },
   // 模块的解析规则
   resolve: {
@@ -37,7 +40,7 @@ module.exports = {
           {
             loader: MiniCssExtractPlugin.loader,
             options: {
-              publicPath: '../../'
+              publicPath: '../../../'
               // you can specify a publicPath here
               // by default it use publicPath in webpackOptions.output
               // publicPath: '/public/path/to/'
@@ -53,7 +56,7 @@ module.exports = {
           {
             loader: MiniCssExtractPlugin.loader,
             options: {
-              publicPath: '../../'
+              publicPath: '../../../'
               // you can specify a publicPath here
               // by default it use publicPath in webpackOptions.output
               // publicPath: '/public/path/to/'
@@ -93,8 +96,25 @@ module.exports = {
   },
   devtool: devMode ? 'inline-source-map' : '',
   optimization: {
+    minimize: false,
+    runtimeChunk: {
+      name: 'manifest' // 将 webpack 的 runtime 代码拆分为一个单独的 chunk。
+    },
     splitChunks: {
-      name: 'common'
+      minSize: 1,
+      chunks: 'initial',
+      name: true,
+      cacheGroups: {
+        vendor: {
+          test: /[\\/]node_modules[\\/]/,
+          priority: -10,
+        },
+        common: {
+          minChunks: 2,
+          priority: -20,
+          reuseExistingChunk: true
+        }
+      }
     }
   },
   plugins: [
@@ -102,21 +122,23 @@ module.exports = {
     new CleanWebpackPlugin(),
     new MiniCssExtractPlugin({
       filename: '[name]/[name].css',
-      chunkFilename: '[id].css'
+      // chunkFilename: 'assets/css/[id].css'
     }),
     new HtmlWebpackPlugin({
       template: './src/learn/index.html',
       filename: 'learn/index.html',
       inject: 'body',
       chunks: ['learn'],
-      hot: true
+      hot: true,
+      minify: false
     }),
     new HtmlWebpackPlugin({
       template: './src/task/index.html',
       filename: 'task/index.html',
       chunks: ['task'],
       inject: 'body',
-      hot: true
+      hot: true,
+      minify: false
     })
   ],
   devServer: {

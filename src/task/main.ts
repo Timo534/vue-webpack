@@ -1,5 +1,8 @@
 import Vue from 'vue'
 import App from './App.vue'
+// import '../learn/b'
+// import './c'
+// import './e'
 
 // 测试babel
 class Person {
@@ -15,6 +18,7 @@ class Person {
       console.log(`Hello, my age is ${this.age}`)
     }
 }
+
 
 // eslint-disable-next-line no-unused-vars
 const vue = new Vue({

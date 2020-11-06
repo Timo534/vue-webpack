@@ -18,13 +18,14 @@ import { func1 } from '@/assets/util'
 export default Vue.extend({
   name: 'App',
   created () {
-    console.log('App')
+    console.log('App1')
     func1()
   }
 })
 </script>
 
 <style lang="scss" scoped>
+  @import "../assets/css/style.scss";
   :root {
     --red: #d33;
   }

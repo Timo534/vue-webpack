@@ -25,6 +25,7 @@ export default Vue.extend({
 </script>
 
 <style lang="scss" scoped>
+  @import "../assets/css/style";
   :root {
     --red: #d33;
   }

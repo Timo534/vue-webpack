@@ -15,3 +15,47 @@
 ## 后续计划
 * 可以打包多应用
 * 尝试各种优化，比如抽离公用代码和第三方库、按需加载等
+
+#### 开启runtimeChunk选项
+作用：当一个文件动态引入一个文件时，修改动态引入的文件内容，这个文件的hash不会改变
+```
+optimization: {
+  runtimeChunk: {
+    name: 'manifest' // 将 webpack 的 runtime 代码拆分为一个单独的 chunk。
+  }
+}
+```
+
+#### 提取第三方库和公用业务代码
+```
+optimization: {
+    splitChunks: {
+        cacheGroups: {
+            vendor: {
+                name: 'chunk-vendors',
+                test: /[\\/]node_modules[\\/]/,
+                priority: -10,
+                chunks: 'initial'
+            },
+            common: {
+                name: 'chunk-common',
+                minChunks: 2,
+                priority: -20,
+                chunks: 'initial',
+                reuseExistingChunk: true
+            }
+        }
+    }
+}
+```
+
+#### 减少 ES6 转为 ES5 的冗余代码
+不需要重复编译helper函数，直接引用@babel/runtime中对应的代码
+```
+yarn add -D @babel/plugin-transform-runtime @babel/runtime
+
+//在 .babelrc 文件中
+"plugins": [
+    "@babel/plugin-transform-runtime"
+]
+```

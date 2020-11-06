@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import App from './App.vue'
+import './b'
 
 // 测试babel
 class Person {
@@ -23,5 +24,6 @@ const vue = new Vue({
   components: { App },
   created () {
     new Person('heartbeat', 20).sayHello()
+    import('../assets/util/getData')
   }
 })

@@ -3,6 +3,7 @@ const { VueLoaderPlugin } = require('vue-loader')
 const { CleanWebpackPlugin } = require('clean-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
+const CompressionWebpackPlugin = require('compression-webpack-plugin')
 const devMode = process.env.NODE_ENV !== 'production'
 
 module.exports = {
@@ -107,7 +108,7 @@ module.exports = {
       cacheGroups: {
         vendor: {
           test: /[\\/]node_modules[\\/]/,
-          priority: -10,
+          priority: -10
         },
         common: {
           minChunks: 2,
@@ -139,6 +140,17 @@ module.exports = {
       inject: 'body',
       hot: true,
       minify: false
+    }),
+    new CompressionWebpackPlugin({
+      // asset: '[path].gz[query]',
+      algorithm: 'gzip',
+      test: new RegExp('\\.(js|css)$'),
+      // 只处理大于xx字节 的文件，默认：0
+      // threshold: 10240,
+      // 示例：一个1024b大小的文件，压缩后大小为768b，minRatio : 0.75
+      minRatio: 0.8, // 默认: 0.8
+      // 是否删除源文件，默认: false
+      deleteOriginalAssets: false
     })
   ],
   devServer: {
